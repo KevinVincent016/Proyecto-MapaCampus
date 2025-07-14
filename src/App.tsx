@@ -14,7 +14,7 @@ function App() {
         setEdificio={setEdificio}
         setPiso={setPiso}
       />
-      <MapaCampus edificio={edificio} piso={piso} />
+      <MapaCampus />
     </>
   );
 }

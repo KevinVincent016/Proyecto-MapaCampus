@@ -1,43 +1,43 @@
-import { MapContainer, ImageOverlay, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
-import type { LatLngTuple } from 'leaflet';
+import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+import geojsonRaw from '../data/map.geojson?raw';
 
-type Espacio = {
-  id: string;
-  nombre: string;
-  x: number; // horizontal
-  y: number; // vertical
-};
+const geojsonData = JSON.parse(geojsonRaw);
 
-type Props = {
-  edificio: string;
-  piso: string;
-};
-
-const MapaCampus = ({ edificio, piso }: Props) => {
-  const bounds: [LatLngTuple, LatLngTuple] = [[0, 0], [1000, 1000]];
-  const imagenUrl = `/mapas/${edificio}_piso-${piso}.png`;
-
-  // Espacios dummy, luego se puede cargar dinámicamente según edificio y piso
-  const espacios: Espacio[] = [
-    { id: 'aula-101', nombre: 'Aula 101', x: 200, y: 600 },
-    { id: 'lab-201', nombre: 'Laboratorio 201', x: 800, y: 400 }
-  ];
-
+const MapaCampus = () => {
   return (
-    <MapContainer
-      center={[500, 500]}
-      zoom={-2}
-      crs={L.CRS.Simple}
-      style={{ height: '80vh', width: '80vw', maxWidth: '1000px', maxHeight: '1000px', margin: '0 auto' }}
-    >
-      <ImageOverlay url={imagenUrl} bounds={bounds} />
-      {espacios.map((espacio) => (
-        <Marker key={espacio.id} position={[espacio.y, espacio.x]}>
-          <Popup>{espacio.nombre}</Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+    <div style={{height: '100%', width: '100%'}}>
+      <MapContainer
+        center={[3.341831, -76.529410]}
+        zoom={18}
+        maxZoom={18}
+        minZoom={16}
+        scrollWheelZoom={true}
+        style={{
+          height: '90vh',
+          width: '90vw',
+          margin: '0 auto',
+        }}
+        maxBounds={[[3.336947, -76.532478], [3.343609, -76.527232]]}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="&copy; OpenStreetMap contributors"
+        />
+        <GeoJSON
+          data={geojsonData}
+          onEachFeature={(feature, layer) => {
+            if (feature.properties?.nombre) {
+              layer.bindPopup(feature.properties.nombre);
+            }
+          }}
+          style={() => ({
+            color: 'blue',
+            weight: 2,
+            fillOpacity: 0.3,
+          })}
+        />
+      </MapContainer>
+    </div>
   );
 };
 
